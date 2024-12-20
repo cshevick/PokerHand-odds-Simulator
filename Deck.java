@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Deck {
 
@@ -18,6 +19,14 @@ public class Deck {
                 cards.add(new Card(rank, suit));
             }
         }
+    }
+
+    public ArrayList<Card> getCards(){
+        return cards;
+    }
+
+    public ArrayList<Card> getUsedCards(){
+        return usedCards;
     }
     
     public String getCard(int index){
@@ -39,37 +48,27 @@ public class Deck {
         }
     }
 
-    public  void drawCard(String suit, String rank){
-        for (Card card: cards){
-            if (card.getRank().equals(rank) && card.getSuit().equals(suit)){
-                Card playedCard = card;
-                cards.remove(playedCard);
-                usedCards.add(playedCard);
+    public static int getSize(ArrayList<Card> cards){
+        return cards.size();
+    }
+   
+
+    public void identifyRemoveCard(Card card) {
+    
+        boolean success = false;
+        Iterator<Card> iterator = cards.iterator();
+        while (iterator.hasNext()) {
+            Card eachCard = iterator.next();
+            if (eachCard.getRank().equals(card.getRank()) && eachCard.getSuit().equals(card.getSuit())) {
+                iterator.remove();
+                usedCards.add(eachCard);
+                success = true;
                 break;
             }
         }
+        if (!success) System.out.println("Card not removed.");
     
-    }
-
-    public void identifyRemoveCard(String input){
-
-        System.out.println("Used Cards deck: " + usedCards.size());
-        System.out.println("Deck size: " + cards.size());
-        
-        String[] split = input.split(" ");
-        
-        if (split.length != 2) {
-            System.out.println("Invalid input. Please enter the card in the format 'Suit Rank'.");
-            return;
-        }
     
-        String suit = split[0];
-        String rank = split[1];
-    
-       drawCard(suit, rank);
-    
-        System.out.println("Used Cards deck: " + usedCards.size());
-        System.out.println("Deck size: " + cards.size());
     }
 
     public void resetDeck(){
