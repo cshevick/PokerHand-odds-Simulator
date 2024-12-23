@@ -1,47 +1,66 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
 public class HandEvaluator {
 
     ArrayList<Card> cardsInPlay;
-    public int handValue;
+    private int[] handValue; // Array: [hand type, high card rank]
 
     public HandEvaluator(Card userCard1, Card userCard2, ArrayList<Card> dealtCards) {
         cardsInPlay = new ArrayList<>();
         cardsInPlay.add(userCard1);
         cardsInPlay.add(userCard2);
-
         cardsInPlay.addAll(dealtCards);
+
+        for (Card card: cardsInPlay) System.out.println(card.toString());
 
         // Rank the hand and assign the hand value
         this.handValue = rankHand(cardsInPlay);
     }
 
-    public int getHandValue() {
+    public int[] getHandValue() {
         return handValue;
     }
 
-    // Method to rank the hand
-    private int rankHand(ArrayList<Card> cards) {
-        // Sort cards by rank
-        cards.sort(Comparator.comparingInt(this::getCardRank));
-
-        // Check hand rankings in order of precedence
-        if (isRoyalFlush(cards)) return 10;
-        if (isStraightFlush(cards)) return 9;
-        if (isFourOfAKind(cards)) return 8;
-        if (isFullHouse(cards)) return 7;
-        if (isFlush(cards)) return 6;
-        if (isStraight(cards)) return 5;
-        if (isThreeOfAKind(cards)) return 4;
-        if (isTwoPair(cards)) return 3;
-        if (isOnePair(cards)) return 2;
-
-        return 1; // High Card
+    public void printValue(){
+        for (int val: handValue){
+            System.out.print(val + " ");
+        }
     }
 
+    // Method to rank the hand
+    private int[] rankHand(ArrayList<Card> cards) {
+        // Sort cards by rank
+        cards.sort(Comparator.comparingInt(this::getCardRank));
+        
+        // Check hand rankings in order of precedence
+        if (isRoyalFlush(cards)) return new int[]{10, 14}; // Royal Flush, high card Ace
+        if (isStraightFlush(cards)) return new int[]{9, getHighCard(cards)};
+        if (isFourOfAKind(cards)) return new int[]{8, getRankWithCount(cards, 4)};
+        if (isFullHouse(cards)) return new int[]{7, getRankWithCount(cards, 3)};
+        if (isFlush(cards)) return new int[]{6, getHighCard(cards)};
+        if (isStraight(cards)) return new int[]{5, getHighCard(cards)}; // Straight
+        if (isThreeOfAKind(cards)) return new int[]{4, getRankWithCount(cards, 3)};
+        if (isTwoPair(cards)) return new int[]{3, getHighestPair(cards)};
+        if (isOnePair(cards)) return new int[]{2, getRankWithCount(cards, 2)};
+    
+        return new int[]{1, getHighCard(cards)}; // High Card
+    }
+    
+    
+    // Get the highest pair rank
+    private int getHighestPair(ArrayList<Card> cards) {
+        ArrayList<Integer> pairs = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : countRanks(cards).entrySet()) {
+            if (entry.getValue() >= 2) {
+                pairs.add(getCardRank(new Card(entry.getKey(), "")));
+            }
+        }
+        pairs.sort(Collections.reverseOrder()); // Sort in descending order
+        return pairs.isEmpty() ? 0 : pairs.get(0); // Return the highest pair
+    }
+    
+
+    // Helper method to get the rank of a card as an integer
     private int getCardRank(Card card) {
         switch (card.getRank()) {
             case "2": return 2;
@@ -53,10 +72,10 @@ public class HandEvaluator {
             case "8": return 8;
             case "9": return 9;
             case "10": return 10;
-            case "J": return 11;
-            case "Q": return 12;
-            case "K": return 13;
-            case "A": return 14;
+            case "Jack": return 11;
+            case "Queen": return 12;
+            case "King": return 13;
+            case "Ace": return 14;
             default: return 0;
         }
     }
@@ -82,25 +101,44 @@ public class HandEvaluator {
         return countSuits(cards).containsValue(5);
     }
 
+    
+    
     private boolean isStraight(ArrayList<Card> cards) {
-        ArrayList<Integer> ranks = new ArrayList<>();
+        // Extract unique ranks and sort them
+        TreeSet<Integer> uniqueRanks = new TreeSet<>();
         for (Card card : cards) {
-            ranks.add(getCardRank(card));
+            uniqueRanks.add(getCardRank(card));
         }
-        Collections.sort(ranks);
-
+    
+        // Convert the sorted unique ranks into a list
+        ArrayList<Integer> ranks = new ArrayList<>(uniqueRanks);
+        
+    
+        // Check for consecutive sequences of at least 5 cards
         for (int i = 0; i <= ranks.size() - 5; i++) {
-            boolean straight = true;
+            boolean isStraight = true;
             for (int j = 0; j < 4; j++) {
                 if (ranks.get(i + j) + 1 != ranks.get(i + j + 1)) {
-                    straight = false;
+                    isStraight = false;
                     break;
                 }
             }
-            if (straight) return true;
+            if (isStraight) {
+               // System.out.println("Straight found with high card: " + ranks.get(i + 4)); // Debugging
+                return true;
+            }
         }
+    
+        // Special Case: Low Ace Straight (A, 2, 3, 4, 5)
+        if (ranks.contains(14) && ranks.contains(2) && ranks.contains(3) &&
+            ranks.contains(4) && ranks.contains(5)) {
+            System.out.println("Low Ace Straight found"); // Debugging
+            return true;
+        }
+    
         return false;
     }
+    
 
     private boolean isThreeOfAKind(ArrayList<Card> cards) {
         return countRanks(cards).containsValue(3);
@@ -133,4 +171,32 @@ public class HandEvaluator {
         }
         return counts;
     }
+
+    // Get the highest card in the hand
+    private int getHighCard(ArrayList<Card> cards) {
+        return cards.stream().mapToInt(this::getCardRank).max().orElse(0);
+    }
+
+    // Get the rank that appears a specific number of times
+    private int getRankWithCount(ArrayList<Card> cards, int count) {
+        return countRanks(cards).entrySet().stream()
+                .filter(entry -> entry.getValue() == count)
+                .map(entry -> getCardRank(new Card(entry.getKey(), "")))
+                .max(Integer::compareTo)
+                .orElse(0);
+    }
+
+    // Get the second highest pair for two pair logic
+    private int getSecondHighPair(ArrayList<Card> cards) {
+        ArrayList<Integer> pairs = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : countRanks(cards).entrySet()) {
+            if (entry.getValue() == 2) {
+                pairs.add(getCardRank(new Card(entry.getKey(), "")));
+            }
+        }
+        pairs.sort(Collections.reverseOrder());
+        return pairs.size() > 1 ? pairs.get(1) : 0;
+    }
+
+   
 }

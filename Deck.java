@@ -29,8 +29,8 @@ public class Deck {
         return usedCards;
     }
     
-    public String getCard(int index){
-        return cards.get(index).toString();
+    public Card getCard(int index){
+        return cards.get(index);
     }
 
     public void printDeck(){
@@ -48,12 +48,12 @@ public class Deck {
         }
     }
 
-    public static int getSize(ArrayList<Card> cards){
+    public int getSize(){
         return cards.size();
     }
    
 
-    public void identifyRemoveCard(Card card) {
+    public void removeCardFromDeck(Card card) {
     
         boolean success = false;
         Iterator<Card> iterator = cards.iterator();
@@ -66,7 +66,7 @@ public class Deck {
                 break;
             }
         }
-        if (!success) System.out.println("Card not removed.");
+        if (!success) System.out.println("Card not removed or card has already been removed.");
     
     
     }
