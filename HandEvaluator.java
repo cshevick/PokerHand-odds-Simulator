@@ -11,8 +11,6 @@ public class HandEvaluator {
         cardsInPlay.add(userCard2);
         cardsInPlay.addAll(dealtCards);
 
-        for (Card card: cardsInPlay) System.out.println(card.toString());
-
         // Rank the hand and assign the hand value
         this.handValue = rankHand(cardsInPlay);
     }

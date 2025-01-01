@@ -6,35 +6,25 @@ class Main {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Card> playedCards = new ArrayList<>();
         Deck deck = new Deck();
-       
+        deck.shuffle();
 
+        System.out.print("Enter the number of other players: " );
+        int numPlayers = scanner.nextInt();
+        scanner.nextLine();
         
         System.out.print("Enter your first card: \n");
-        Card userCard1 = cardUserInput(scanner,deck);
+        Card userCard1 = cardUserInput(scanner, deck);
         
         System.out.print("Enter your second card: \n");
         Card userCard2 = cardUserInput(scanner, deck);
 
-        OddsSimulator simulator = new OddsSimulator(userCard1, userCard2, deck, 2);
+        ArrayList<Card> dealtCards = new ArrayList<>(); // Initialize the boardCards list
+        OddsSimulator simulator = new OddsSimulator(userCard1, userCard2, deck, numPlayers, dealtCards);
+        System.out.println("Odds Pre flop: " + 100 * simulator.simulate(1, dealtCards, deck));
 
-        /* 
 
-        System.out.println("\nEnter the board: \n");
-
-        playedCards.add(Main.cardUserInput(scanner, deck));
-        playedCards.add(Main.cardUserInput(scanner, deck));
-        playedCards.add(Main.cardUserInput(scanner, deck));
-        playedCards.add(Main.cardUserInput(scanner, deck));
-        playedCards.add(Main.cardUserInput(scanner, deck));
-    
-
-        HandEvaluator hand1 = new HandEvaluator(userCard1, userCard2, playedCards);
-        HandEvaluator hand2 = new HandEvaluator(new Card("4","Spades"), new Card("3","Spades"), playedCards);
-
-        betterHand(hand1, hand2);
         
-        */
-
+        
         scanner.close();
     }
 
@@ -85,9 +75,9 @@ class Main {
             rank = scanner.nextLine();
         }
 
-        Card inputCard = new Card(rank,suit);
+        Card inputCard = new Card(rank, suit);
 
-        deck.removeCardFromDeck(inputCard);
+       
         return inputCard;
     }
 }

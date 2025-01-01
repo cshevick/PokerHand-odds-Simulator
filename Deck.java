@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class Deck {
 
@@ -54,7 +56,6 @@ public class Deck {
    
 
     public void removeCardFromDeck(Card card) {
-    
         boolean success = false;
         Iterator<Card> iterator = cards.iterator();
         while (iterator.hasNext()) {
@@ -66,14 +67,26 @@ public class Deck {
                 break;
             }
         }
-        if (!success) System.out.println("Card not removed or card has already been removed.");
+        if (!success) {
+            System.out.println("Duplicate or missing card: " + card);
+        }
+    }
     
-    
+
+    public void resetDeck() {
+    cards.addAll(usedCards);
+    usedCards.clear();
+
+    // Validate deck size after reset
+    if (cards.size() != 52) {
+        System.out.println("Error: Deck size mismatch after reset. Expected: 52, Actual: " + cards.size());
     }
 
-    public void resetDeck(){
-        cards.addAll(usedCards);
-        usedCards.clear();
+    // Ensure no duplicates exist
+    Set<Card> uniqueCards = new HashSet<>(cards);
+    if (uniqueCards.size() != cards.size()) {
+        System.out.println("Error: Duplicate cards detected in the deck after reset.");
     }
+}
 
 }
