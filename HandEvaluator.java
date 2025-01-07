@@ -33,17 +33,16 @@ public class HandEvaluator {
         // Check hand rankings in order of precedence
         if (isRoyalFlush(cards)) return new int[]{10, 14}; // Royal Flush, high card Ace
         if (isStraightFlush(cards)) return new int[]{9, getHighCard(cards)};
-        if (isFourOfAKind(cards)) return new int[]{8, getRankWithCount(cards, 4)};
-        if (isFullHouse(cards)) return new int[]{7, getRankWithCount(cards, 3)};
-        if (isFlush(cards)) return new int[]{6, getHighCard(cards)};
-        if (isStraight(cards)) return new int[]{5, getHighCard(cards)}; // Straight
+        if (isFourOfAKind(cards))  return new int[]{8, getRankWithCount(cards, 4)};
+        if (isFullHouse(cards))    return new int[]{7, getRankWithCount(cards, 3)};
+        if (isFlush(cards))        return new int[]{6, getHighCard(cards)};
+        if (isStraight(cards))     return new int[]{5, getHighCard(cards)};
         if (isThreeOfAKind(cards)) return new int[]{4, getRankWithCount(cards, 3)};
-        if (isTwoPair(cards)) return new int[]{3, getHighestPair(cards)};
-        if (isOnePair(cards)) return new int[]{2, getRankWithCount(cards, 2)};
+        if (isTwoPair(cards))      return new int[]{3, getHighestPair(cards)};
+        if (isOnePair(cards))      return new int[]{2, getRankWithCount(cards, 2)};
     
         return new int[]{1, getHighCard(cards)}; // High Card
     }
-    
     
     // Get the highest pair rank
     private int getHighestPair(ArrayList<Card> cards) {
@@ -57,24 +56,23 @@ public class HandEvaluator {
         return pairs.isEmpty() ? 0 : pairs.get(0); // Return the highest pair
     }
     
-
     // Helper method to get the rank of a card as an integer
     private int getCardRank(Card card) {
         switch (card.getRank()) {
-            case "2": return 2;
-            case "3": return 3;
-            case "4": return 4;
-            case "5": return 5;
-            case "6": return 6;
-            case "7": return 7;
-            case "8": return 8;
-            case "9": return 9;
-            case "10": return 10;
+            case "2":    return 2;
+            case "3":    return 3;
+            case "4":    return 4;
+            case "5":    return 5;
+            case "6":    return 6;
+            case "7":    return 7;
+            case "8":    return 8;
+            case "9":    return 9;
+            case "10":   return 10;
             case "Jack": return 11;
-            case "Queen": return 12;
+            case "Queen":return 12;
             case "King": return 13;
-            case "Ace": return 14;
-            default: return 0;
+            case "Ace":  return 14;
+            default:     return 0;
         }
     }
 
@@ -99,19 +97,15 @@ public class HandEvaluator {
         return countSuits(cards).containsValue(5);
     }
 
-    
-    
     private boolean isStraight(ArrayList<Card> cards) {
         // Extract unique ranks and sort them
         TreeSet<Integer> uniqueRanks = new TreeSet<>();
         for (Card card : cards) {
             uniqueRanks.add(getCardRank(card));
         }
-    
-        // Convert the sorted unique ranks into a list
+
         ArrayList<Integer> ranks = new ArrayList<>(uniqueRanks);
         
-    
         // Check for consecutive sequences of at least 5 cards
         for (int i = 0; i <= ranks.size() - 5; i++) {
             boolean isStraight = true;
@@ -121,22 +115,17 @@ public class HandEvaluator {
                     break;
                 }
             }
-            if (isStraight) {
-               // System.out.println("Straight found with high card: " + ranks.get(i + 4)); // Debugging
-                return true;
-            }
+            if (isStraight) return true;
         }
-    
+
         // Special Case: Low Ace Straight (A, 2, 3, 4, 5)
-        if (ranks.contains(14) && ranks.contains(2) && ranks.contains(3) &&
-            ranks.contains(4) && ranks.contains(5)) {
-            System.out.println("Low Ace Straight found"); // Debugging
+        if (ranks.contains(14) && ranks.contains(2) && 
+            ranks.contains(3) && ranks.contains(4) && ranks.contains(5)) {
             return true;
         }
-    
+
         return false;
     }
-    
 
     private boolean isThreeOfAKind(ArrayList<Card> cards) {
         return countRanks(cards).containsValue(3);
@@ -184,7 +173,7 @@ public class HandEvaluator {
                 .orElse(0);
     }
 
-    // Get the second highest pair for two pair logic
+    // Get the second highest pair for two pair logic (not used above, but here if needed)
     private int getSecondHighPair(ArrayList<Card> cards) {
         ArrayList<Integer> pairs = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : countRanks(cards).entrySet()) {
@@ -195,6 +184,4 @@ public class HandEvaluator {
         pairs.sort(Collections.reverseOrder());
         return pairs.size() > 1 ? pairs.get(1) : 0;
     }
-
-   
 }

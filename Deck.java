@@ -8,7 +8,7 @@ public class Deck {
     public ArrayList<Card> cards;
     public ArrayList<Card> usedCards;
 
-    public Deck(){
+    public Deck() {
         cards = new ArrayList<>();
         usedCards = new ArrayList<>();
 
@@ -16,32 +16,32 @@ public class Deck {
         String[] ranks = {"2", "3", "4", "5", "6", "7", "8", "9", "10",
                           "Jack", "Queen", "King", "Ace"};
 
-        for (String suit : suits){
-            for (String rank : ranks){
+        for (String suit : suits) {
+            for (String rank : ranks) {
                 cards.add(new Card(rank, suit));
             }
         }
     }
 
-    public ArrayList<Card> getCards(){
+    public ArrayList<Card> getCards() {
         return cards;
     }
 
-    public ArrayList<Card> getUsedCards(){
+    public ArrayList<Card> getUsedCards() {
         return usedCards;
     }
     
-    public Card getCard(int index){
+    public Card getCard(int index) {
         return cards.get(index);
     }
 
-    public void printDeck(){
-        for (Card card: cards){
+    public void printDeck() {
+        for (Card card: cards) {
             System.out.println(card);
         }
     }
 
-    public void shuffle(){
+    public void shuffle() {
         for (int i = 0; i < cards.size(); i++){
             int randomIndex = (int) (Math.random() * cards.size());
             Card temp = cards.get(i);
@@ -50,17 +50,17 @@ public class Deck {
         }
     }
 
-    public int getSize(){
+    public int getSize() {
         return cards.size();
     }
-   
 
     public void removeCardFromDeck(Card card) {
         boolean success = false;
         Iterator<Card> iterator = cards.iterator();
         while (iterator.hasNext()) {
             Card eachCard = iterator.next();
-            if (eachCard.getRank().equals(card.getRank()) && eachCard.getSuit().equals(card.getSuit())) {
+            if (eachCard.getRank().equals(card.getRank()) &&
+                eachCard.getSuit().equals(card.getSuit())) {
                 iterator.remove();
                 usedCards.add(eachCard);
                 success = true;
@@ -68,25 +68,25 @@ public class Deck {
             }
         }
         if (!success) {
+            // Either a duplicate removal or the card wasn't found in the deck
             System.out.println("Duplicate or missing card: " + card);
         }
     }
     
-
     public void resetDeck() {
-    cards.addAll(usedCards);
-    usedCards.clear();
-
-    // Validate deck size after reset
-    if (cards.size() != 52) {
-        System.out.println("Error: Deck size mismatch after reset. Expected: 52, Actual: " + cards.size());
+        // Move all used cards back into the main deck
+        cards.addAll(usedCards);
+        usedCards.clear();
+        shuffle();
+    
+        // Validate deck size and uniqueness
+        if (cards.size() != 52) {
+            throw new IllegalStateException("Deck size mismatch after reset: " + cards.size());
+        }
+    
+        Set<Card> uniqueCards = new HashSet<>(cards);
+        if (uniqueCards.size() != cards.size()) {
+            throw new IllegalStateException("Duplicate cards detected in the deck after reset.");
+        }
     }
-
-    // Ensure no duplicates exist
-    Set<Card> uniqueCards = new HashSet<>(cards);
-    if (uniqueCards.size() != cards.size()) {
-        System.out.println("Error: Duplicate cards detected in the deck after reset.");
-    }
-}
-
 }
