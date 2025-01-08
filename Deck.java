@@ -59,8 +59,9 @@ public class Deck {
         Iterator<Card> iterator = cards.iterator();
         while (iterator.hasNext()) {
             Card eachCard = iterator.next();
-            if (eachCard.getRank().equals(card.getRank()) &&
-                eachCard.getSuit().equals(card.getSuit())) {
+            // Compare ignoring case for suits, and normalize rank
+            if (eachCard.getRank().equalsIgnoreCase(card.getRank()) &&
+                eachCard.getSuit().equalsIgnoreCase(card.getSuit())) {
                 iterator.remove();
                 usedCards.add(eachCard);
                 success = true;
@@ -68,10 +69,10 @@ public class Deck {
             }
         }
         if (!success) {
-            // Either a duplicate removal or the card wasn't found in the deck
             System.out.println("Duplicate or missing card: " + card);
         }
     }
+    
     
     public void resetDeck() {
         // Move all used cards back into the main deck
