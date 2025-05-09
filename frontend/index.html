@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Poker Odds Calculator</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle, #1b5e20, #0d2b10);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            width: 500px;
+        }
+
+        .table {
+            width: 300px;
+            height: 300px;
+            background-color: #2e7d32;
+            border: 8px solid #795548;
+            border-radius: 50%;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .button {
+            background-color: #fbc02d;
+            border: none;
+            color: black;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            background-color: #f9a825;
+        }
+
+        input {
+            padding: 5px;
+            font-size: 14px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .odds-box {
+            margin-top: 10px;
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Poker Odds Calculator</h1>
+        <div class="table" id="table"></div>
+
+        <div id="controls">
+            <input type="number" id="numPlayers" placeholder="Number of players" min="2" max="10">
+            <input type="text" id="card1" placeholder="First card (Hearts King)">
+            <input type="text" id="card2" placeholder="Second card (Hearts Ace)">
+            <button class="button" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div class="odds-box" id="oddsBox"></div>
+    </div>
+
+    <script>
+        let stage = 0;
+        let numPlayers;
+        let holeCards = [];
+        let boardCards = [];
+        let oddsBox = document.getElementById('oddsBox');
+
+        function startGame() {
+            numPlayers = document.getElementById('numPlayers').value;
+            let card1 = document.getElementById('card1').value;
+            let card2 = document.getElementById('card2').value;
+
+            if (!numPlayers || !card1 || !card2) {
+                alert('Please enter all fields.');
+                return;
+            }
+
+            holeCards = [card1, card2];
+            boardCards = [];
+            stage = 1;
+            oddsBox.innerHTML = '';
+
+            showOdds('Pre-Flop odds');  // ✅ show pre-flop odds immediately
+            nextStep();
+        }
+
+
+        function nextStep() {
+            if (stage === 1) {
+                showStageInput('Flop card 1', card => {
+                    boardCards.push(card);
+                    showStageInput('Flop card 2', card => {
+                        boardCards.push(card);
+                        showStageInput('Flop card 3', card => {
+                            boardCards.push(card);
+                            showOdds('Post-Flop odds');
+                            stage = 2;
+                            nextStep();
+                        });
+                    });
+                });
+            } else if (stage === 2) {
+                showStageInput('Turn card', card => {
+                    boardCards.push(card);
+                    showOdds('Post-Turn odds');
+                    stage = 3;
+                    nextStep();
+                });
+            } else if (stage === 3) {
+                showStageInput('River card', card => {
+                    boardCards.push(card);
+                    showOdds('Post-River odds');
+                    stage = 4;
+                    endGame();
+                });
+            }
+        }
+
+        function showStageInput(placeholder, callback) {
+            document.getElementById('controls').innerHTML = `
+                <input type="text" id="stageInput" placeholder="${placeholder}">
+                <button class="button" onclick="submitStageInput()">Submit</button>
+            `;
+            const inputField = document.getElementById('stageInput');
+        
+            // Add event listener for Enter key
+            inputField.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    submitStageInput();
+                }
+            });
+        
+            window.submitStageInput = function () {
+                let val = inputField.value;
+                if (!val) {
+                    alert('Please enter a card.');
+                    return;
+                }
+                callback(val);
+            };
+        }
+
+        function showOdds(stageName) {
+            const fakeOdds = Math.floor(Math.random() * 50) + 50;
+            oddsBox.innerHTML += `<div>${stageName}: ${fakeOdds}% chance to win</div>`;
+        }
+
+        function endGame() {
+            document.getElementById('controls').innerHTML = `
+                <button class="button" onclick="resetGame()">Play Again</button>
+            `;
+        }
+
+        function resetGame() {
+            document.getElementById('controls').innerHTML = `
+                <input type="number" id="numPlayers" placeholder="Number of players" min="2" max="10">
+                <input type="text" id="card1" placeholder="First card (Hearts King)">
+                <input type="text" id="card2" placeholder="Second card (Hearts Ace)">
+                <button class="button" onclick="startGame()">Start Game</button>
+            `;
+            oddsBox.innerHTML = '';
+            stage = 0;
+            holeCards = [];
+            boardCards = [];
+        }
+    </script>
+</body>
+</html>
