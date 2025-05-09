@@ -73,7 +73,7 @@ class OddsSimulator {
             }
         }
     
-        return (double) wins / (wins + losses);
+        return (wins + ties / 2.0) / numRepetitions;
     }
     
     
