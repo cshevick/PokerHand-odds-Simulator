@@ -1,18 +1,8 @@
 package backend;
-import java.util.*;          // collections, Map, etc.
-
-/**
- * Evaluates the best 5-card poker hand that can be made from
- * 2 hole-cards + up to 5 community cards.
- *
- * handValue[0]  – category (10 = Royal Flush, … 1 = High Card)
- * handValue[1]  – tie-breaker (highest rank that defines the hand)
- */
+import java.util.*;        
 public class HandEvaluator {
 
     private final int[] handValue;      // immutable after construction
-
-    /* ----------  constructor & public helpers  ---------- */
 
     public HandEvaluator(Card hole1, Card hole2, ArrayList<Card> communityCards) {
         ArrayList<Card> all = new ArrayList<>(7);
@@ -29,8 +19,6 @@ public class HandEvaluator {
         System.out.println(handValue[0] + " " + handValue[1]);
     }
 
-
-    /* ----------  main ranking routine  ---------- */
 
     private int[] rankHand(ArrayList<Card> cards) {
 
@@ -69,8 +57,6 @@ public class HandEvaluator {
     }
 
 
-    /* ----------  category tests & helpers  ---------- */
-
     private boolean isFourOfAKind(ArrayList<Card> cards) {
         return countRanks(cards).containsValue(4);
     }
@@ -96,7 +82,7 @@ public class HandEvaluator {
     }
 
 
-    /* ----------  straight / flush helpers  ---------- */
+  
 
     /** highest card in any straight-flush (14 = royal, 0 = none) */
     private int getStraightFlushHigh(ArrayList<Card> cards) {
@@ -161,9 +147,6 @@ public class HandEvaluator {
         }
         return 0;
     }
-
-
-    /* ----------  rank / suit counters & misc  ---------- */
 
     private Map<String,Integer> countRanks(ArrayList<Card> cards) {
         Map<String,Integer> map = new HashMap<>();
